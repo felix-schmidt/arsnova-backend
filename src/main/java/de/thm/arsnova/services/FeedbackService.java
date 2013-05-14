@@ -25,6 +25,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import javax.annotation.PostConstruct;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.scheduling.annotation.Scheduled;
@@ -34,6 +36,7 @@ import de.thm.arsnova.dao.IDatabaseDao;
 import de.thm.arsnova.entities.Feedback;
 import de.thm.arsnova.entities.User;
 import de.thm.arsnova.exceptions.NoContentException;
+import de.thm.arsnova.exceptions.NotFoundException;
 import de.thm.arsnova.socket.ARSnovaSocketIOServer;
 
 @Service
@@ -52,6 +55,8 @@ public class FeedbackService implements IFeedbackService {
 
 	@Autowired
 	private IDatabaseDao databaseDao;
+	
+	private FeedbackStorage feedbackStorage;
 
 	@Autowired
 	private IUserService userService;
@@ -59,21 +64,30 @@ public class FeedbackService implements IFeedbackService {
 	public final void setDatabaseDao(final IDatabaseDao newDatabaseDao) {
 		this.databaseDao = newDatabaseDao;
 	}
+	
+	@PostConstruct
+	public final void init() {
+		this.feedbackStorage = new FeedbackStorage();
+	}
+	
+	public final void resetStorage() {
+		this.feedbackStorage.reset();
+	}
 
 	@Override
 	@Scheduled(fixedDelay = DEFAULT_SCHEDULER_DELAY)
 	public final void cleanFeedbackVotes() {
-		databaseDao.cleanFeedbackVotes(cleanupFeedbackDelay);
+		feedbackStorage.cleanFeedbackVotes(cleanupFeedbackDelay);
 	}
 
 	@Override
 	public final Feedback getFeedback(final String keyword) {
-		return databaseDao.getFeedback(keyword);
+		return feedbackStorage.getFeedback(keyword);
 	}
 
 	@Override
 	public final int getFeedbackCount(final String keyword) {
-		Feedback feedback = databaseDao.getFeedback(keyword);
+		Feedback feedback = feedbackStorage.getFeedback(keyword);
 		List<Integer> values = feedback.getValues();
 		return values.get(Feedback.FEEDBACK_FASTER) + values.get(Feedback.FEEDBACK_OK)
 				+ values.get(Feedback.FEEDBACK_SLOWER) + values.get(Feedback.FEEDBACK_AWAY);
@@ -81,7 +95,7 @@ public class FeedbackService implements IFeedbackService {
 
 	@Override
 	public final double getAverageFeedback(final String sessionkey) {
-		Feedback feedback = databaseDao.getFeedback(sessionkey);
+		Feedback feedback = feedbackStorage.getFeedback(sessionkey);
 		List<Integer> values = feedback.getValues();
 		double count = values.get(Feedback.FEEDBACK_FASTER) + values.get(Feedback.FEEDBACK_OK)
 				+ values.get(Feedback.FEEDBACK_SLOWER) + values.get(Feedback.FEEDBACK_AWAY);
@@ -101,7 +115,7 @@ public class FeedbackService implements IFeedbackService {
 
 	@Override
 	public final boolean saveFeedback(final String keyword, final int value, final User user) {
-		boolean result = databaseDao.saveFeedback(keyword, value, user);
+		boolean result = feedbackStorage.saveFeedback(keyword, value, user);
 		if (result) {
 			this.server.reportUpdatedFeedbackForSession(keyword);
 		}
@@ -137,7 +151,7 @@ public class FeedbackService implements IFeedbackService {
 
 	@Override
 	public final Integer getMyFeedback(final String keyword, final User user) {
-		return this.databaseDao.getMyFeedback(keyword, user);
+		return this.feedbackStorage.getMyFeedback(keyword, user);
 	}
 	
 	private static class FeedbackStorageObject {
@@ -158,12 +172,21 @@ public class FeedbackService implements IFeedbackService {
 	}
 	
 	private static class FeedbackStorage {
+        public static final int FEEDBACK_FASTER = 0;
+        public static final int FEEDBACK_OK = 1;
+        public static final int FEEDBACK_SLOWER = 2;
+        public static final int FEEDBACK_AWAY = 3;
+		
 		private Map<String, Map<String, FeedbackStorageObject>> data;
 
 		public FeedbackStorage() {
 			this.data = new HashMap<String, Map<String,FeedbackStorageObject>>();
 		}
 
+		public void reset() {
+			data.clear();
+		}
+		
 		public Feedback getFeedback(String keyword) {
 			int a = 0;
 			int b = 0;
@@ -171,21 +194,21 @@ public class FeedbackService implements IFeedbackService {
 			int d = 0;
 			
 			if (data.get(keyword) == null) {
-				return new Feedback(0, 0, 0, 0);
+				throw new NotFoundException();
 			}
 			
 			for (FeedbackStorageObject fso : data.get(keyword).values()) {
 				switch (fso.getValue()) {
-				case 0:
+				case FEEDBACK_FASTER:
 					a++;
 					break;
-				case 1:
+				case FEEDBACK_OK:
 					b++;
 					break;
-				case 2:
+				case FEEDBACK_SLOWER:
 					c++;
 					break;
-				case 3:
+				case FEEDBACK_AWAY:
 					d++;
 					break;
 				default:
@@ -194,6 +217,14 @@ public class FeedbackService implements IFeedbackService {
 			}
 			
 			return new Feedback(a, b, c, d);
+		}
+
+		public Integer getMyFeedback(String keyword, User user) {
+			try {
+				return data.get(keyword).get(user.getUsername()).getValue();
+			} catch (Exception e) {
+				return 0;
+			}
 		}
 
 		public boolean saveFeedback(String keyword, int value, User user) {

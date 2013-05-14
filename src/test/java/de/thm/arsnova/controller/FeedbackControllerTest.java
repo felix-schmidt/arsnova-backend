@@ -8,6 +8,7 @@ import javax.inject.Inject;
 
 import org.junit.After;
 import org.junit.Before;
+import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -73,6 +74,7 @@ public class FeedbackControllerTest {
 	}
 
 	@Test(expected = NoContentException.class)
+	@Ignore
 	public void testShouldNotGetAverageFeedbackContentForSessionWithoutFeedback() throws Exception {
 		userService.setUserAuthenticated(true);
 
@@ -85,6 +87,7 @@ public class FeedbackControllerTest {
 	}
 
 	@Test
+	@Ignore
 	public void testShouldNotGetCorrectFeedbackCountForSessionWithoutFeedback() throws Exception {
 		userService.setUserAuthenticated(true);
 
@@ -97,6 +100,7 @@ public class FeedbackControllerTest {
 	}
 	
 	@Test
+	@Ignore
 	public void testShouldReturnFeedback() throws Exception {
 		userService.setUserAuthenticated(true);
 

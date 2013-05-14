@@ -26,6 +26,8 @@ import de.thm.arsnova.entities.Feedback;
 import de.thm.arsnova.entities.User;
 
 public interface IFeedbackService {
+	void resetStorage();
+	
 	void cleanFeedbackVotes();
 
 	Feedback getFeedback(String keyword);
