@@ -85,6 +85,6 @@
 		<tracking-mode>COOKIE</tracking-mode>
 
 		<!-- delete sessions after 6 hours -->
-		<session-timeout>360</session-timeout>
+<!--		<session-timeout>360</session-timeout> -->
 	</session-config>
 </web-app>
