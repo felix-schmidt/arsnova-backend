@@ -6,5 +6,6 @@ group :test do
 	gem 'rspec-expectations', '2.7.0'
 	gem 'httparty', '0.8.1'
 	gem 'childprocess', '0.2.3'
+	gem 'json'
 	
 end
