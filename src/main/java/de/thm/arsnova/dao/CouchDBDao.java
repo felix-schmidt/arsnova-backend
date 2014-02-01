@@ -307,6 +307,8 @@ public class CouchDBDao implements IDatabaseDao {
 			q.put("showStatistic", question.isShowStatistic());
 			q.put("showAnswer", question.isShowAnswer());
 			q.put("abstention", question.isAbstention());
+			q.put("image", question.getImage());
+			q.put("imageScaled", question.getImageScaled());
 			this.database.saveDocument(q);
 			question.set_rev(q.getRev());
 
