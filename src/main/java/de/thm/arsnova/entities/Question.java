@@ -43,7 +43,45 @@ public class Question {
 	private boolean abstention;
 	private String _id;
 	private String _rev;
+	
+	// grid square
+	private String image;
+	private String imageScaled;
+	
+	
+	/***
+	 * Returns the image.
+	 * @return the image as base64.
+	 */
+	public final String getImage() {
+		return image;
+	}
 
+	/***
+	 * Sets the image.
+	 * @param image image as base64.
+	 */
+	public final void setImage(String image) {
+		this.image = image;
+	}
+
+	/***
+	 * Returns the scaled image.
+	 * @return the image as base64.
+	 */
+	public final String getImageScaled() {
+		return imageScaled;
+	}
+
+	/***
+	 * Sets the scaled image.
+	 * @param imageScaled the image as base64.
+	 */
+	public final void setImageScaled(String imageScaled) {
+		this.imageScaled = imageScaled;
+	}
+
+	
 	public final String getType() {
 		return type;
 	}
