@@ -47,7 +47,23 @@ public class Question {
 	// grid square
 	private String image;
 	private String imageScaled;
+	private String gridsize;
 	
+	/**
+	 * Returns the gridsize
+	 * @return the gridsize
+	 */
+	public String getGridsize() {
+		return gridsize;
+	}
+
+	/**
+	 * Sets the gridsize
+	 * @param gridsize the gridsize to set
+	 */
+	public void setGridsize(String gridsize) {
+		this.gridsize = gridsize;
+	}
 	
 	/***
 	 * Returns the image.

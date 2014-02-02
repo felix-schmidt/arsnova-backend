@@ -287,8 +287,10 @@ public class CouchDBDao implements IDatabaseDao {
 		q.put("showStatistic", question.isShowStatistic());
 		q.put("showAnswer", question.isShowAnswer());
 		q.put("abstention", question.isAbstention());
+		// Grid square params
 		q.put("image", question.getImage());
 		q.put("imageScaled", question.getImageScaled());
+		q.put("gridsize", question.getGridsize());
 
 		return q;
 	}
@@ -307,8 +309,10 @@ public class CouchDBDao implements IDatabaseDao {
 			q.put("showStatistic", question.isShowStatistic());
 			q.put("showAnswer", question.isShowAnswer());
 			q.put("abstention", question.isAbstention());
+			// Grid square params
 			q.put("image", question.getImage());
 			q.put("imageScaled", question.getImageScaled());
+			q.put("gridsize", question.getGridsize());
 			this.database.saveDocument(q);
 			question.set_rev(q.getRev());
 
