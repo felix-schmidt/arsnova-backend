@@ -68,3 +68,5 @@ Feature: Hallo Name
     And delete the foreign session
     And I retrieve my session information
     Then My session should no longer be available
+    
+ Scenario: Create lecturequestion
