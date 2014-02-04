@@ -19,7 +19,14 @@
 
 package de.thm.arsnova.dao;
 
+import java.net.MalformedURLException;
+import java.net.URL; 
+import java.net.HttpURLConnection; 
+import java.io.BufferedReader;
+import java.io.DataOutputStream;
 import java.io.IOException;
+import java.io.InputStreamReader;
+import java.io.OutputStreamWriter;
 import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
 import java.text.SimpleDateFormat;
@@ -35,6 +42,11 @@ import net.sf.json.JSONArray;
 import net.sf.json.JSONObject;
 import net.sf.json.util.JSONUtils;
 
+import org.apache.http.HttpResponse;
+import org.apache.http.client.methods.HttpPut;
+import org.apache.http.entity.ContentType;
+import org.apache.http.entity.StringEntity;
+import org.apache.http.impl.client.DefaultHttpClient;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -261,16 +273,48 @@ public class CouchDBDao implements IDatabaseDao {
 			database.saveDocument(q);
 			question.set_id(q.getId());
 			question.set_rev(q.getRev());
+
+			DefaultHttpClient httpClient = new DefaultHttpClient();
+			StringBuilder result = new StringBuilder();
+			try {
+					System.out.println("=================== ATTACHMENT =================");
+					HttpPut putRequest = new HttpPut("http://127.0.0.1:5984/arsnova/" + q.getId() + "/attachment?rev=" + q.getRev());
+					StringEntity myEntity = new StringEntity("important message", 
+							   ContentType.create("text/plain", "UTF-8"));
+					putRequest.setEntity(myEntity);
+					
+					HttpResponse response = httpClient.execute(putRequest);
+					BufferedReader br = new BufferedReader(new InputStreamReader(
+						(response.getEntity().getContent())));
+					
+					String output;
+					while ((output = br.readLine()) != null) {
+						result.append(output);
+					}
+					
+					System.out.println("=================== ATTACHMENT SUCESS=================");
+					System.out.println("=================== RESP =================");
+					System.out.println(result.toString());
+					System.out.println("=================== RESP =================");
+					
+				} catch (IOException e) {
+					System.out.println("=================== ATTACHMENT FAIL =================");
+			}
+
 			return question;
+			
 		} catch (IOException e) {
+			System.out.println("FEHLER beim ERSTELLEN!!!!");
 			LOGGER.error("Could not save question {}", question);
 		}
+
 		return null;
 	}
 
-	private Document toQuestionDocument(final Session session,
-			final Question question) {
+	private Document toQuestionDocument(final Session session, final Question question) {
+		
 		Document q = new Document();
+		
 		q.put("type", "skill_question");
 		q.put("questionType", question.getQuestionType());
 		q.put("questionVariant", question.getQuestionVariant());
@@ -291,10 +335,10 @@ public class CouchDBDao implements IDatabaseDao {
 		q.put("image", question.getImage());
 		q.put("imageScaled", question.getImageScaled());
 		q.put("gridsize", question.getGridsize());
-
+	
 		return q;
 	}
-
+	
 	@Override
 	public final Question updateQuestion(final Question question) {
 		try {
@@ -313,6 +357,7 @@ public class CouchDBDao implements IDatabaseDao {
 			q.put("image", question.getImage());
 			q.put("imageScaled", question.getImageScaled());
 			q.put("gridsize", question.getGridsize());
+
 			this.database.saveDocument(q);
 			question.set_rev(q.getRev());
 

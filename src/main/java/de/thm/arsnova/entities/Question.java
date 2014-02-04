@@ -43,6 +43,7 @@ public class Question {
 	private boolean abstention;
 	private String _id;
 	private String _rev;
+	private Object _attachments;
 	
 	// grid square
 	private String image;
@@ -270,4 +271,19 @@ public class Question {
 	public final String toString() {
 		return "Question type '" + this.type + "': " + this.subject + ";\n" + this.text + this.possibleAnswers;
 	}
+
+	/**
+	 * @return the _attachments
+	 */
+	public Object get_attachments() {
+		return _attachments;
+	}
+
+	/**
+	 * @param _attachments the _attachments to set
+	 */
+	public void set_attachments(Object _attachments) {
+		this._attachments = _attachments.toString();
+	}
+	
 }
