@@ -20,6 +20,8 @@ package de.thm.arsnova.entities;
 
 import java.util.List;
 
+import net.sf.ezmorph.bean.MorphDynaBean;
+
 public class Question {
 
 	private String type;
@@ -276,14 +278,42 @@ public class Question {
 	 * @return the _attachments
 	 */
 	public Object get_attachments() {
-		return _attachments;
+		/* convert MorphDynaBean object to Attachment object */
+		Attachment att = (Attachment) _attachments;
+		
+		/* return digest */
+		return att.getDigest();
 	}
 
 	/**
 	 * @param _attachments the _attachments to set
 	 */
 	public void set_attachments(Object _attachments) {
-		this._attachments = _attachments.toString();
+		/* convert Object to MorphDynaBean */
+		MorphDynaBean mdb = (MorphDynaBean) _attachments;
+		
+		/* get integrated object >attachment< of type MorphDynaBean */
+		MorphDynaBean mdb2 = (MorphDynaBean) mdb.get("attachment");
+		
+		/* get object variables from attachment */
+		boolean stub = Boolean.parseBoolean(mdb2.get("stub").toString());
+		int length = Integer.parseInt(mdb2.get("length").toString());
+		String digest = mdb2.get("digest").toString();
+		int revpos = Integer.parseInt(mdb2.get("revpos").toString());
+		String content_type = mdb2.get("content_type").toString();
+
+		/* new Object of type Attachment */
+		Attachment att = new Attachment();
+		
+		/* set attachment properties */
+		att.setStub(stub);
+		att.setLength(length);
+		att.setDigest(digest);
+		att.setRevpos(revpos);
+		att.setContent_type(content_type);
+		
+		/* return Attachment object */		
+		this._attachments = att;
 	}
 	
 }
