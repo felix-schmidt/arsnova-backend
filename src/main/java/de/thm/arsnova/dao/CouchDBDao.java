@@ -274,7 +274,7 @@ public class CouchDBDao implements IDatabaseDao {
 			question.set_id(q.getId());
 			question.set_rev(q.getRev());
 			
-			if (question.getType() == "gs") {
+			if (question.getQuestionType().equals("gs")) {
 				DefaultHttpClient httpClient = new DefaultHttpClient();
 				StringBuilder result = new StringBuilder();
 				try {
@@ -302,7 +302,6 @@ public class CouchDBDao implements IDatabaseDao {
 						System.out.println("=================== ATTACHMENT FAIL =================");
 				}
 			}
-
 			return question;
 			
 		} catch (IOException e) {
