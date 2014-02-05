@@ -273,32 +273,34 @@ public class CouchDBDao implements IDatabaseDao {
 			database.saveDocument(q);
 			question.set_id(q.getId());
 			question.set_rev(q.getRev());
-
-			DefaultHttpClient httpClient = new DefaultHttpClient();
-			StringBuilder result = new StringBuilder();
-			try {
-					System.out.println("=================== ATTACHMENT =================");
-					HttpPut putRequest = new HttpPut("http://127.0.0.1:5984/arsnova/" + q.getId() + "/attachment?rev=" + q.getRev());
-					StringEntity myEntity = new StringEntity("important message", 
-							   ContentType.create("text/plain", "UTF-8"));
-					putRequest.setEntity(myEntity);
-					
-					HttpResponse response = httpClient.execute(putRequest);
-					BufferedReader br = new BufferedReader(new InputStreamReader(
-						(response.getEntity().getContent())));
-					
-					String output;
-					while ((output = br.readLine()) != null) {
-						result.append(output);
-					}
-					
-					System.out.println("=================== ATTACHMENT SUCESS=================");
-					System.out.println("=================== RESP =================");
-					System.out.println(result.toString());
-					System.out.println("=================== RESP =================");
-					
-				} catch (IOException e) {
-					System.out.println("=================== ATTACHMENT FAIL =================");
+			
+			if (question.getType() == "gs") {
+				DefaultHttpClient httpClient = new DefaultHttpClient();
+				StringBuilder result = new StringBuilder();
+				try {
+						System.out.println("=================== ATTACHMENT =================");
+						HttpPut putRequest = new HttpPut("http://127.0.0.1:5984/arsnova/" + q.getId() + "/attachment?rev=" + q.getRev());
+						StringEntity myEntity = new StringEntity("important message", 
+								   ContentType.create("text/plain", "UTF-8"));
+						putRequest.setEntity(myEntity);
+						
+						HttpResponse response = httpClient.execute(putRequest);
+						BufferedReader br = new BufferedReader(new InputStreamReader(
+							(response.getEntity().getContent())));
+						
+						String output;
+						while ((output = br.readLine()) != null) {
+							result.append(output);
+						}
+						
+						System.out.println("=================== ATTACHMENT SUCESS=================");
+						System.out.println("=================== RESP =================");
+						System.out.println(result.toString());
+						System.out.println("=================== RESP =================");
+						
+					} catch (IOException e) {
+						System.out.println("=================== ATTACHMENT FAIL =================");
+				}
 			}
 
 			return question;
