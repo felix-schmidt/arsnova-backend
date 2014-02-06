@@ -18,6 +18,7 @@
  */
 package de.thm.arsnova.entities;
 
+import java.nio.Buffer;
 import java.util.List;
 
 import net.sf.ezmorph.bean.MorphDynaBean;
@@ -45,7 +46,7 @@ public class Question {
 	private boolean abstention;
 	private String _id;
 	private String _rev;
-	private String _attachments;
+	private Object _attachments;
 
 	// grid square
 	private String gridsize;
@@ -260,15 +261,27 @@ public class Question {
 	/**
 	 * @return the _attachments
 	 */
-	public String get_attachments() {
-		return _attachments;
+	public Object get_attachments() {
+		/* return immage instead of attachment -> workaround for the bad REST-API */
+		return this.image;
 	}
 
 	/**
 	 * @param _attachments the _attachments to set
 	 */
 	public void set_attachments(Object _attachments) {
-		this._attachments = _attachments.toString();
+		/* convert Object to MorphDynaBean Object */
+		MorphDynaBean mdb = (MorphDynaBean) _attachments;
+		
+		/* get attachment and convert to MorphDynaBean Object */
+		MorphDynaBean mdb2 = (MorphDynaBean) mdb.get("attachment");
+		
+		/* get string from couchdb and set it to image*/
+		String str = mdb2.get("digest").toString();
+		setImage(str);
+		
+		/* return unchanged _attachment object -> workaround for the bad REST-API */
+		this._attachments = _attachments;
 	}
 
 }
