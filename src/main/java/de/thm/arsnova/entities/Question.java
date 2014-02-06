@@ -18,8 +18,18 @@
  */
 package de.thm.arsnova.entities;
 
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStreamReader;
 import java.nio.Buffer;
 import java.util.List;
+
+import org.apache.http.HttpResponse;
+import org.apache.http.client.methods.HttpGet;
+import org.apache.http.client.methods.HttpPut;
+import org.apache.http.entity.ContentType;
+import org.apache.http.entity.StringEntity;
+import org.apache.http.impl.client.DefaultHttpClient;
 
 import net.sf.ezmorph.bean.MorphDynaBean;
 
@@ -262,7 +272,7 @@ public class Question {
 	 * @return the _attachments
 	 */
 	public Object get_attachments() {
-		/* return immage instead of attachment -> workaround for the bad REST-API */
+		/* return image instead of attachment -> workaround for the bad REST-API */
 		return this.image;
 	}
 
@@ -276,9 +286,26 @@ public class Question {
 		/* get attachment and convert to MorphDynaBean Object */
 		MorphDynaBean mdb2 = (MorphDynaBean) mdb.get("attachment");
 		
-		/* get string from couchdb and set it to image*/
-		String str = mdb2.get("digest").toString();
-		setImage(str);
+		/* get image (base64) from attachment */
+		DefaultHttpClient httpClient = new DefaultHttpClient();
+		StringBuilder result = new StringBuilder();
+		try {
+				System.out.println("=================== ATTACHMENT =================");
+				HttpGet getRequest = new HttpGet("http://127.0.0.1:5984/arsnova/" + this._id + "/attachment?rev=" + _rev);
+				HttpResponse response = httpClient.execute(getRequest);
+				BufferedReader br = new BufferedReader(new InputStreamReader(
+					(response.getEntity().getContent())));
+
+				String output;
+				while ((output = br.readLine()) != null) {
+					result.append(output);
+				}
+
+			} catch (IOException e) {
+				System.out.println("=================== ATTACHMENT FAIL =================");
+		}
+		/* set the result to image */
+		setImage(result.toString());
 		
 		/* return unchanged _attachment object -> workaround for the bad REST-API */
 		this._attachments = _attachments;
