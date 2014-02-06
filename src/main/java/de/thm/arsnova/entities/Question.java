@@ -45,13 +45,12 @@ public class Question {
 	private boolean abstention;
 	private String _id;
 	private String _rev;
-	private Object _attachments;
-	
+	private String _attachments;
+
 	// grid square
-	private String image;
-	private String imageScaled;
 	private String gridsize;
-	
+	private String image;
+
 	/**
 	 * Returns the gridsize
 	 * @return the gridsize
@@ -67,7 +66,7 @@ public class Question {
 	public void setGridsize(String gridsize) {
 		this.gridsize = gridsize;
 	}
-	
+
 	/***
 	 * Returns the image.
 	 * @return the image as base64.
@@ -84,23 +83,7 @@ public class Question {
 		this.image = image;
 	}
 
-	/***
-	 * Returns the scaled image.
-	 * @return the image as base64.
-	 */
-	public final String getImageScaled() {
-		return imageScaled;
-	}
 
-	/***
-	 * Sets the scaled image.
-	 * @param imageScaled the image as base64.
-	 */
-	public final void setImageScaled(String imageScaled) {
-		this.imageScaled = imageScaled;
-	}
-
-	
 	public final String getType() {
 		return type;
 	}
@@ -277,43 +260,15 @@ public class Question {
 	/**
 	 * @return the _attachments
 	 */
-	public Object get_attachments() {
-		/* convert MorphDynaBean object to Attachment object */
-		Attachment att = (Attachment) _attachments;
-		
-		/* return digest */
-		return att.getDigest();
+	public String get_attachments() {
+		return _attachments;
 	}
 
 	/**
 	 * @param _attachments the _attachments to set
 	 */
 	public void set_attachments(Object _attachments) {
-		/* convert Object to MorphDynaBean */
-		MorphDynaBean mdb = (MorphDynaBean) _attachments;
-		
-		/* get integrated object >attachment< of type MorphDynaBean */
-		MorphDynaBean mdb2 = (MorphDynaBean) mdb.get("attachment");
-		
-		/* get object variables from attachment */
-		boolean stub = Boolean.parseBoolean(mdb2.get("stub").toString());
-		int length = Integer.parseInt(mdb2.get("length").toString());
-		String digest = mdb2.get("digest").toString();
-		int revpos = Integer.parseInt(mdb2.get("revpos").toString());
-		String content_type = mdb2.get("content_type").toString();
-
-		/* new Object of type Attachment */
-		Attachment att = new Attachment();
-		
-		/* set attachment properties */
-		att.setStub(stub);
-		att.setLength(length);
-		att.setDigest(digest);
-		att.setRevpos(revpos);
-		att.setContent_type(content_type);
-		
-		/* return Attachment object */		
-		this._attachments = att;
+		this._attachments = _attachments.toString();
 	}
-	
+
 }

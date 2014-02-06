@@ -20,8 +20,8 @@
 package de.thm.arsnova.dao;
 
 import java.net.MalformedURLException;
-import java.net.URL; 
-import java.net.HttpURLConnection; 
+import java.net.URL;
+import java.net.HttpURLConnection;
 import java.io.BufferedReader;
 import java.io.DataOutputStream;
 import java.io.IOException;
@@ -273,37 +273,37 @@ public class CouchDBDao implements IDatabaseDao {
 			database.saveDocument(q);
 			question.set_id(q.getId());
 			question.set_rev(q.getRev());
-			
+
 			if (question.getQuestionType().equals("gs")) {
 				DefaultHttpClient httpClient = new DefaultHttpClient();
 				StringBuilder result = new StringBuilder();
 				try {
 						System.out.println("=================== ATTACHMENT =================");
 						HttpPut putRequest = new HttpPut("http://127.0.0.1:5984/arsnova/" + q.getId() + "/attachment?rev=" + q.getRev());
-						StringEntity myEntity = new StringEntity("important message", 
+						StringEntity myEntity = new StringEntity(question.getImage(),
 								   ContentType.create("text/plain", "UTF-8"));
 						putRequest.setEntity(myEntity);
-						
+
 						HttpResponse response = httpClient.execute(putRequest);
 						BufferedReader br = new BufferedReader(new InputStreamReader(
 							(response.getEntity().getContent())));
-						
+
 						String output;
 						while ((output = br.readLine()) != null) {
 							result.append(output);
 						}
-						
+
 						System.out.println("=================== ATTACHMENT SUCESS=================");
 						System.out.println("=================== RESP =================");
 						System.out.println(result.toString());
 						System.out.println("=================== RESP =================");
-						
+
 					} catch (IOException e) {
 						System.out.println("=================== ATTACHMENT FAIL =================");
 				}
 			}
 			return question;
-			
+
 		} catch (IOException e) {
 			System.out.println("FEHLER beim ERSTELLEN!!!!");
 			LOGGER.error("Could not save question {}", question);
@@ -313,9 +313,9 @@ public class CouchDBDao implements IDatabaseDao {
 	}
 
 	private Document toQuestionDocument(final Session session, final Question question) {
-		
+
 		Document q = new Document();
-		
+
 		q.put("type", "skill_question");
 		q.put("questionType", question.getQuestionType());
 		q.put("questionVariant", question.getQuestionVariant());
@@ -333,13 +333,11 @@ public class CouchDBDao implements IDatabaseDao {
 		q.put("showAnswer", question.isShowAnswer());
 		q.put("abstention", question.isAbstention());
 		// Grid square params
-		q.put("image", question.getImage());
-		q.put("imageScaled", question.getImageScaled());
 		q.put("gridsize", question.getGridsize());
-	
+
 		return q;
 	}
-	
+
 	@Override
 	public final Question updateQuestion(final Question question) {
 		try {
@@ -355,8 +353,6 @@ public class CouchDBDao implements IDatabaseDao {
 			q.put("showAnswer", question.isShowAnswer());
 			q.put("abstention", question.isAbstention());
 			// Grid square params
-			q.put("image", question.getImage());
-			q.put("imageScaled", question.getImageScaled());
 			q.put("gridsize", question.getGridsize());
 
 			this.database.saveDocument(q);
