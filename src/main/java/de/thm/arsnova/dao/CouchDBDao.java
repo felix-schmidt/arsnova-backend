@@ -38,11 +38,13 @@ import java.util.List;
 import net.sf.ezmorph.Morpher;
 import net.sf.ezmorph.MorpherRegistry;
 import net.sf.ezmorph.bean.BeanMorpher;
+import net.sf.ezmorph.bean.MorphDynaBean;
 import net.sf.json.JSONArray;
 import net.sf.json.JSONObject;
 import net.sf.json.util.JSONUtils;
 
 import org.apache.http.HttpResponse;
+import org.apache.http.client.methods.HttpGet;
 import org.apache.http.client.methods.HttpPut;
 import org.apache.http.entity.ContentType;
 import org.apache.http.entity.StringEntity;
@@ -278,7 +280,7 @@ public class CouchDBDao implements IDatabaseDao {
 				DefaultHttpClient httpClient = new DefaultHttpClient();
 				StringBuilder result = new StringBuilder();
 				try {
-						System.out.println("=================== ATTACHMENT =================");
+
 						HttpPut putRequest = new HttpPut("http://127.0.0.1:5984/arsnova/" + q.getId() + "/attachment?rev=" + q.getRev());
 						StringEntity myEntity = new StringEntity(question.getImage(),
 								   ContentType.create("text/plain", "UTF-8"));
@@ -293,19 +295,13 @@ public class CouchDBDao implements IDatabaseDao {
 							result.append(output);
 						}
 
-						System.out.println("=================== ATTACHMENT SUCESS=================");
-						System.out.println("=================== RESP =================");
-						System.out.println(result.toString());
-						System.out.println("=================== RESP =================");
-
 					} catch (IOException e) {
-						System.out.println("=================== ATTACHMENT FAIL =================");
+						LOGGER.error("Attachement upload failed!");
 				}
 			}
 			return question;
 
 		} catch (IOException e) {
-			System.out.println("FEHLER beim ERSTELLEN!!!!");
 			LOGGER.error("Could not save question {}", question);
 		}
 
@@ -341,6 +337,7 @@ public class CouchDBDao implements IDatabaseDao {
 	@Override
 	public final Question updateQuestion(final Question question) {
 		try {
+
 			Document q = this.database.getDocument(question.get_id());
 			q.put("subject", question.getSubject());
 			q.put("text", question.getText());
@@ -354,10 +351,38 @@ public class CouchDBDao implements IDatabaseDao {
 			q.put("abstention", question.isAbstention());
 			// Grid square params
 			q.put("gridsize", question.getGridsize());
+			//q.put("image",question.getImage());
+			//q.put("_attachments",question.get_attachments());
+
+
+
 
 			this.database.saveDocument(q);
 			question.set_rev(q.getRev());
 
+			if (question.getQuestionType().equals("gs")) {
+				DefaultHttpClient httpClient = new DefaultHttpClient();
+				StringBuilder result = new StringBuilder();
+				try {
+						HttpPut putRequest = new HttpPut("http://127.0.0.1:5984/arsnova/" + q.getId() + "/attachment?rev=" + q.getRev());
+						StringEntity myEntity = new StringEntity(question.getImage(),
+								   ContentType.create("text/plain", "UTF-8"));
+						putRequest.setEntity(myEntity);
+
+						HttpResponse response = httpClient.execute(putRequest);
+						BufferedReader br = new BufferedReader(new InputStreamReader(
+							(response.getEntity().getContent())));
+
+						String output;
+						while ((output = br.readLine()) != null) {
+							result.append(output);
+						}
+
+
+					} catch (IOException e) {
+						LOGGER.error("Attachment upload failed!");
+				}
+			}
 			return question;
 		} catch (IOException e) {
 			LOGGER.error("Could not update question {}", question);

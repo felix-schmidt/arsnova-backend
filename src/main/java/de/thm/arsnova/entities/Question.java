@@ -269,28 +269,19 @@ public class Question {
 	}
 
 	/**
-	 * @return the _attachments
-	 */
-	public Object get_attachments() {
-		/* return image instead of attachment -> workaround for the bad REST-API */
-		return this.image;
-	}
-
-	/**
 	 * @param _attachments the _attachments to set
 	 */
 	public void set_attachments(Object _attachments) {
 		/* convert Object to MorphDynaBean Object */
 		MorphDynaBean mdb = (MorphDynaBean) _attachments;
-		
+
 		/* get attachment and convert to MorphDynaBean Object */
 		MorphDynaBean mdb2 = (MorphDynaBean) mdb.get("attachment");
-		
+
 		/* get image (base64) from attachment */
 		DefaultHttpClient httpClient = new DefaultHttpClient();
 		StringBuilder result = new StringBuilder();
 		try {
-				System.out.println("=================== ATTACHMENT =================");
 				HttpGet getRequest = new HttpGet("http://127.0.0.1:5984/arsnova/" + this._id + "/attachment?rev=" + _rev);
 				HttpResponse response = httpClient.execute(getRequest);
 				BufferedReader br = new BufferedReader(new InputStreamReader(
@@ -302,13 +293,12 @@ public class Question {
 				}
 
 			} catch (IOException e) {
-				System.out.println("=================== ATTACHMENT FAIL =================");
 		}
 		/* set the result to image */
-		setImage(result.toString());
-		
+		this.image = result.toString();
+
 		/* return unchanged _attachment object -> workaround for the bad REST-API */
-		this._attachments = _attachments;
+		this._attachments = this.image;
 	}
 
 }
