@@ -18,7 +18,20 @@
  */
 package de.thm.arsnova.entities;
 
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStreamReader;
+import java.nio.Buffer;
 import java.util.List;
+
+import org.apache.http.HttpResponse;
+import org.apache.http.client.methods.HttpGet;
+import org.apache.http.client.methods.HttpPut;
+import org.apache.http.entity.ContentType;
+import org.apache.http.entity.StringEntity;
+import org.apache.http.impl.client.DefaultHttpClient;
+
+import net.sf.ezmorph.bean.MorphDynaBean;
 
 public class Question {
 
@@ -43,6 +56,44 @@ public class Question {
 	private boolean abstention;
 	private String _id;
 	private String _rev;
+	private Object _attachments;
+
+	// grid square
+	private String gridsize;
+	private String image;
+
+	/**
+	 * Returns the gridsize
+	 * @return the gridsize
+	 */
+	public String getGridsize() {
+		return gridsize;
+	}
+
+	/**
+	 * Sets the gridsize
+	 * @param gridsize the gridsize to set
+	 */
+	public void setGridsize(String gridsize) {
+		this.gridsize = gridsize;
+	}
+
+	/***
+	 * Returns the image.
+	 * @return the image as base64.
+	 */
+	public final String getImage() {
+		return image;
+	}
+
+	/***
+	 * Sets the image.
+	 * @param image image as base64.
+	 */
+	public final void setImage(String image) {
+		this.image = image;
+	}
+
 
 	public final String getType() {
 		return type;
@@ -216,4 +267,38 @@ public class Question {
 	public final String toString() {
 		return "Question type '" + this.type + "': " + this.subject + ";\n" + this.text + this.possibleAnswers;
 	}
+
+	/**
+	 * @param _attachments the _attachments to set
+	 */
+	public void set_attachments(Object _attachments) {
+		/* convert Object to MorphDynaBean Object */
+		MorphDynaBean mdb = (MorphDynaBean) _attachments;
+
+		/* get attachment and convert to MorphDynaBean Object */
+		MorphDynaBean mdb2 = (MorphDynaBean) mdb.get("attachment");
+
+		/* get image (base64) from attachment */
+		DefaultHttpClient httpClient = new DefaultHttpClient();
+		StringBuilder result = new StringBuilder();
+		try {
+				HttpGet getRequest = new HttpGet("http://127.0.0.1:5984/arsnova/" + this._id + "/attachment?rev=" + _rev);
+				HttpResponse response = httpClient.execute(getRequest);
+				BufferedReader br = new BufferedReader(new InputStreamReader(
+					(response.getEntity().getContent())));
+
+				String output;
+				while ((output = br.readLine()) != null) {
+					result.append(output);
+				}
+
+			} catch (IOException e) {
+		}
+		/* set the result to image */
+		this.image = result.toString();
+
+		/* return unchanged _attachment object -> workaround for the bad REST-API */
+		this._attachments = this.image;
+	}
+
 }
