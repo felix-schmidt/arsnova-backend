@@ -1,6 +1,10 @@
+#ermoeglicht das Nutzen von httparty vergleichbar wie include in java
 require 'httparty'
 require 'json'
 
+# anlegen einer neuen class und bekommt sämtliche eigenschaften von HTTParty
+# lediglich no_follow wird mit true ueberschrieben
+# verhindert das redirect nach einem request
 class HTTPartyNoFollow
   include HTTParty
   no_follow true
