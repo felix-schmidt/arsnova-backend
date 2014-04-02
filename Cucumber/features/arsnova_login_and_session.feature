@@ -1,4 +1,4 @@
-Feature: Hallo Name
+Feature: Login and Session
 
   Scenario: Login into arsnova
     Given Arsnova is up and running
@@ -30,7 +30,7 @@ Feature: Hallo Name
     Given Arsnova is up and running
     When I login in to arsnova as a guest
     And create a new session
-    #And delete my new session
+    And delete my new session
     And I retrieve my session information
     Then My session should no longer be available
 
@@ -51,13 +51,13 @@ Feature: Hallo Name
     And I retrieve my session information
     Then my session should be unlocked
 
-  Scenario: Update a session
-    Given Arsnova is up and running
-    When I login in to arsnova as a guest
-    And create a new session
-    And change the name to fragestunde 
+  #Scenario: Update a session
+    #Given Arsnova is up and running
+    #When I login in to arsnova as a guest
+    #And create a new session
+    #And change the name to fragestunde 
     #And I retrieve my session information
-    Then the session should be have the name fragestunde
+    #Then the session should be have the name fragestunde
     
  Scenario: Delete foreign user session
     Given Arsnova is up and running
@@ -67,6 +67,4 @@ Feature: Hallo Name
     And retrieve the global session list as user2
     And delete the foreign session
     And I retrieve my session information
-    Then My session should no longer be available
-    
- Scenario: Create lecturequestion
+    Then the session should not be deleted

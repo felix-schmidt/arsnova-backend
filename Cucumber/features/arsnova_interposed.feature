@@ -34,6 +34,7 @@ Feature: InterposedQuestions
     When I login in to arsnova as a guest
     And create a new session
     And I create a new interposedQuestion for the session
+    And Retrieve the ID for this Interposed Question
     Then I should get this question by ID
 
   Scenario: Delete a certain interposedQuestion by ID
@@ -41,6 +42,7 @@ Feature: InterposedQuestions
     When I login in to arsnova as a guest
     And create a new session
     And I create a new interposedQuestion for the session
+    And Retrieve the ID for this Interposed Question
     And I delete this interposedQuestion 
     Then there should be no question anymore
     
