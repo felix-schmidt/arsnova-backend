@@ -20,7 +20,6 @@
 			<param-name>contextConfigLocation</param-name>
 			<param-value>
 				/WEB-INF/spring/arsnova-servlet.xml
-				/WEB-INF/spring/spring-websocket.xml
 			</param-value>
 		</init-param>
 		<load-on-startup>1</load-on-startup>
@@ -89,6 +88,6 @@
 		<tracking-mode>COOKIE</tracking-mode>
 
 		<!-- delete sessions after 6 hours -->
-<!--		<session-timeout>360</session-timeout> -->
+		<session-timeout>360</session-timeout>
 	</session-config>
 </web-app>
